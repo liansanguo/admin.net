@@ -1,0 +1,285 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: admin-net
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: adminnet-secret
+  namespace: admin-net
+type: Opaque
+stringData:
+  mysql-root-password: "000000"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adminnet-config
+  namespace: admin-net
+data:
+  Database.json: |
+    {
+      "$schema": "https://gitee.com/dotnetchina/Furion/raw/v4/schemas/v4/furion-schema.json",
+      "DbConnection": {
+        "EnableConsoleSql": true,
+        "ConnectionConfigs": [
+          {
+            "DbType": "MySql",
+            "ConnectionString": "server=172.16.93.204;port=3306;database=admin;user=root;password=000000;CharSet=utf8mb4;SslMode=none;AllowPublicKeyRetrieval=True;",
+            "DbSettings": {
+              "EnableInitDb": true,
+              "EnableDiffLog": false,
+              "EnableUnderLine": false
+            },
+            "TableSettings": {
+              "EnableInitTable": true,
+              "EnableIncreTable": false
+            },
+            "SeedSettings": {
+              "EnableInitSeed": true,
+              "EnableIncreSeed": false
+            }
+          }
+        ]
+      }
+    }
+  Cache.json: |
+    {
+      "$schema": "https://gitee.com/dotnetchina/Furion/raw/v4/schemas/v4/furion-schema.json",
+      "Cache": {
+        "CacheType": "Memory",
+        "Redis": {
+          "Configuration": "server=redis:6379;password=;db=5;",
+          "Prefix": "adminnet_",
+          "MaxMessageSize": 1048576,
+          "AutoDetect": false
+        },
+        "SignalR": {
+          "Enabled": false,
+          "RedisConfiguration": "redis:6379,ssl=false,password=,defaultDatabase=5"
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: admin-net
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: master
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: admin
+            - name: MYSQL_ROOT_HOST
+              value: "%"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: adminnet-secret
+                  key: mysql-root-password
+          args:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+            - --default-authentication-plugin=mysql_native_password
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          hostPath:
+            path: /data/admin-net/mysql
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: admin-net
+spec:
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminnet-api
+  namespace: admin-net
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: adminnet-api
+  template:
+    metadata:
+      labels:
+        app: adminnet-api
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - master
+                      - node1
+                      - node2
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: adminnet-api
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: api
+          image: adminnet-api:k8s
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5005
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:5005
+          volumeMounts:
+            - name: config
+              mountPath: /app/Configuration/Database.json
+              subPath: Database.json
+            - name: config
+              mountPath: /app/Configuration/Cache.json
+              subPath: Cache.json
+      volumes:
+        - name: config
+          configMap:
+            name: adminnet-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminnet-api
+  namespace: admin-net
+spec:
+  selector:
+    app: adminnet-api
+  ports:
+    - name: http
+      port: 5005
+      targetPort: 5005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminnet-web
+  namespace: admin-net
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: adminnet-web
+  template:
+    metadata:
+      labels:
+        app: adminnet-web
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - master
+                      - node1
+                      - node2
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: adminnet-web
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: web
+          image: adminnet-web:k8s
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminnet-web
+  namespace: admin-net
+spec:
+  type: NodePort
+  selector:
+    app: adminnet-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adminnet
+  namespace: admin-net
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: adminnet.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adminnet-web
+                port:
+                  number: 80
+    - host: adminnet.192.168.1.10.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adminnet-web
+                port:
+                  number: 80

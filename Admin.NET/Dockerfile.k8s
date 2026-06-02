@@ -1,0 +1,9 @@
+FROM mysql:8.0 AS runtime
+WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:5005
+EXPOSE 5005
+
+RUN microdnf install -y libicu && microdnf clean all
+COPY publish/api/ ./
+RUN chmod +x ./Admin.NET.Web.Entry
+ENTRYPOINT ["./Admin.NET.Web.Entry"]

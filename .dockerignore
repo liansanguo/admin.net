@@ -1,0 +1,13 @@
+.git
+.vs
+.vscode
+**/bin
+**/obj
+**/node_modules
+docker/mysql/mysql
+docker/redis/data
+docker/redis/logs
+docker/minio/data
+docker/minio/config
+docker/tdengine/taos/dnode/data
+docker/tdengine/taos/dnode/log

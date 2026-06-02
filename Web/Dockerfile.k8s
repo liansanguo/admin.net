@@ -1,0 +1,8 @@
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+EXPOSE 80
+
+COPY Web/dist/ ./dist/
+COPY k8s/static-server.mjs ./static-server.mjs
+CMD ["node", "static-server.mjs"]
