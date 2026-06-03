@@ -24,7 +24,7 @@ docker run --rm \
   -v "${ROOT_DIR}:/src" \
   -w /src/Admin.NET \
   mcr.microsoft.com/dotnet/sdk:10.0 \
-  bash -lc "dotnet restore Admin.NET.sln && dotnet publish Admin.NET.Web.Entry/Admin.NET.Web.Entry.csproj -c Release -r linux-x64 --self-contained true -o /src/publish/api /p:PublishSingleFile=false"
+  bash -lc "dotnet restore Admin.NET.sln && dotnet publish Admin.NET.Web.Entry/Admin.NET.Web.Entry.csproj -f net10.0 -c Release -r linux-x64 --self-contained true -o /src/publish/api /p:PublishSingleFile=false"
 
 echo "Build Web with Node container"
 docker run --rm \
