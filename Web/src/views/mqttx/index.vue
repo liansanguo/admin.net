@@ -284,7 +284,8 @@
 import { reactive, ref, onMounted, nextTick } from 'vue';
 import { Search, ChatDotSquare, TopRight, Star, Operation, Setting, Connection, Discount, Open, Delete, Position } from '@element-plus/icons-vue';
 //import * as MQTT from 'mqtt/dist/mqtt.min'; // 针对4.3.7版本的引用方法。5.7.x会提示错误 (import * as MQTT from "mqtt")
-import * as MQTT from "mqtt"
+import MQTT from 'mqtt';
+import type { ISubscriptionGrant, MqttClient } from 'mqtt';
 import mittBus from '/@/utils/mitt'; // 事件总线mitt 解决打包后错误Uncaught (in promise) ReferenceError: Cannot access 'oe' before initialization
 
 // vue 3 + vite use MQTT.js refer to https://github.com/mqttjs/MQTT.js/issues/1269
@@ -301,7 +302,7 @@ const runSeconds = ref(0); // 工作时长
 // mqtt客户端变量 let或const
 const client = ref({
 	connected: false, //未连接
-} as MQTT.MqttClient);
+} as MqttClient);
 
 const receivedMessages = ref('');
 const subscribedSuccess = ref(false); //订阅成功标志
@@ -391,13 +392,13 @@ onMounted(async () => {
 // topic & QoS for MQTT subscribing 订阅主题(多个)
 const subscription = ref({
 	topic: `$(connection.subTopics.value)`,
-	qos: 0 as MQTT.QoS,
+	qos: 0 as 0 | 1 | 2,
 });
 
 // topic, QoS & payload for publishing message 发布主题
 const publish = ref({
 	topic: `${connection.pubTopic}`,
-	qos: 0 as MQTT.QoS,
+	qos: 0 as 0 | 1 | 2,
 	retain: false, //保留否
 	payload: '55 AA AA AA AA 91 CF', //'{ "msg": "Hello, I am browser." }',
 });
@@ -405,7 +406,7 @@ const publish = ref({
 const initData = () => {
 	client.value = {
 		connected: false,
-	} as MQTT.MqttClient;
+	} as MqttClient;
 	retryTimes.value = 0;
 	btnLoadingType.value = '';
 	subscribedSuccess.value = false;
@@ -610,7 +611,7 @@ const doSubscribe = () => {
 	btnLoadingType.value = 'subscribe';
 	const { topic, qos } = subscription.value;
 	console.log(connection.subTopics, '订阅主题');
-	client.value.subscribe(connection.subTopics, { qos }, (error: Error, granted: mqtt.ISubscriptionGrant[]) => {
+	client.value.subscribe(connection.subTopics, { qos }, (error: Error, granted: ISubscriptionGrant[]) => {
 		btnLoadingType.value = '';
 		if (error) {
 			console.log('subscribe error:', error);
