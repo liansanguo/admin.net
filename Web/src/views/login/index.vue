@@ -4,8 +4,8 @@
 			<div class="login-left-logo">
 				<img :src="getThemeConfig.logoUrl" />
 				<div class="login-left-logo-text">
-					<span>{{ getThemeConfig.globalViceTitle }}</span>
-					<span class="login-left-logo-text-msg">{{ getThemeConfig.globalViceTitleMsg }}</span>
+					<span>欢迎使用</span>
+					<span class="login-left-logo-text-msg" style="color:red">Admin.NET测试环境</span>
 				</div>
 			</div>
 			<el-carousel height="500px" class="login-carousel">
