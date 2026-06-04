@@ -17,7 +17,7 @@ import { reactive, ref, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
 	mode: { type: String, default: '' }, // 通知栏模式，可选值为 closeable link
-	text: { type: String, default: '欢迎使用 Admin.NET 通用权限开发框架 <a href="https://gitee.com/zuohuaijun/Admin.NET" target="_blank">https://gitee.com/zuohuaijun/Admin.NET</a>' }, // 通知文本内容
+	text: { type: String, default: '欢迎使用 Admin.NET测试 <a href="https://gitee.com/zuohuaijun/Admin.NET" target="_blank">https://gitee.com/zuohuaijun/Admin.NET</a>' }, // 通知文本内容
 	color: { type: String, default: 'var(--el-color-warning)' }, // 通知文本颜色
 	background: { type: String, default: 'var(--el-color-warning-light-9)' }, // 通知背景色
 	size: { type: [Number, String], default: 14 }, // 字体大小，单位px
