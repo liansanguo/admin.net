@@ -137,9 +137,9 @@ export const useThemeConfig = defineStore('themeConfig', {
 			// 网站主标题（菜单导航、浏览器当前网页标题）
 			globalTitle: 'Admin.NET',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitle: 'Admin.NET',
+			globalViceTitle: '欢迎使用',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitleMsg: '站在巨人肩膀上的 .NET 通用权限开发框架',
+			globalViceTitleMsg: 'Admin.NET测试环境',
 			// 版权和备案文字
 			copyright: 'Copyright © 2021-present Admin.NET All rights reserved.',
 			// 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
