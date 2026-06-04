@@ -163,7 +163,7 @@ const loginRightWarpHeight = !tenantInfo.value?.id && themeConfig.value.hideTena
 				.login-left-logo-text-msg {
 					padding-top: 5px;
 					font-size: 14px;
-					color: var(--el-color-white);
+					color: red;
 				}
 			}
 		}
