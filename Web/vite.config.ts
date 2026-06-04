@@ -88,12 +88,9 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			assetsInlineLimit: 5000, // 小于此阈值的导入或引用资源将内联为 base64 编码
 			sourcemap: false, // 构建后是否生成 source map 文件
 			extractComments: false, // 移除注释
-			minify: 'terser', // 启用后 terserOptions 配置才有效
-			terserOptions: {
-				compress: {
-					drop_console: true, // 生产环境时移除console
-					drop_debugger: true,
-				},
+			minify: 'esbuild',
+			esbuildOptions: {
+				drop: ['console', 'debugger'],
 			},
 			rollupOptions: {
 				output: {
