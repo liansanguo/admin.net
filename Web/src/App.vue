@@ -125,9 +125,9 @@ const loadSysInfo = () => {
 			// 主标题
 			themeConfig.value.globalTitle = data.title;
 			// 副标题
-			themeConfig.value.globalViceTitle = data.viceTitle;
+			themeConfig.value.globalViceTitle = '欢迎使用';
 			// 系统说明
-			themeConfig.value.globalViceTitleMsg = data.viceDesc;
+			themeConfig.value.globalViceTitleMsg = 'Admin.NET测试环境';
 			// Icp备案信息
 			themeConfig.value.icp = data.icp;
 			themeConfig.value.icpUrl = data.icpUrl;
