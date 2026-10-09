@@ -18,11 +18,11 @@ namespace Admin.NET.Web.Entry.Controllers
         //{dd
         //    _systemService = systemService;
         //}
-
+        //dddd
         public IActionResult Index()
         {
             //ViewBag.Description = _systemService.GetDescription();
-            //ssss
+            //ssss等等
             return View();
         }
     }
