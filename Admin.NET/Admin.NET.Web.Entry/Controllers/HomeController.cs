@@ -22,7 +22,7 @@ namespace Admin.NET.Web.Entry.Controllers
         public IActionResult Index()
         {
             //ViewBag.Description = _systemService.GetDescription();
-
+            //ssss
             return View();
         }
     }
