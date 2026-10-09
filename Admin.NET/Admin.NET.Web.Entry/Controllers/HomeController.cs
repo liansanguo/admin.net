@@ -18,7 +18,7 @@ namespace Admin.NET.Web.Entry.Controllers
         //{
         //    _systemService = systemService;
         //}
-
+        //dddd
         public IActionResult Index()
         {
             //ViewBag.Description = _systemService.GetDescription();
